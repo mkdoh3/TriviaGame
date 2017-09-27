@@ -1,13 +1,5 @@
-//make an api call to gather all of the available categories and then pick 5 at random to populate the html
-
-
-
-
-//response is equal to the json object returned from the ajax call, response has one key "trivia_catageories" that contains a an array of 24 objects that represent the available trivia categories
-//generate 5 random numbers 0-24 to correspond to the 24 elements in the categories array, repeat 5 times pushing those elements into the random categories array
-//generate 5 buttons for the five random categories, each button hold a data attribute that is equal to the category id needed to make the api call
-//record category id on click
-
+//why does my timer not show up right away
+//why does timer.empty not work inside of the ifTimeOut function??
 
 
 let randomCategories = [];
@@ -17,6 +9,8 @@ let numberCorrect = 0;
 let numberWrong = 0;
 let questionBank = [];
 let correctAnswer = "";
+let timeRemaining = 10;
+var decreaseTime;
 const container = $(".container");
 
 
@@ -24,8 +18,8 @@ function initialSetup() {
     randomCategories = [];
     numberCorrect = 0;
     numberWrong = 0;
-    $(".container").empty();
-    $(".container").append("<h1>Pick a Category</h1>")
+    container.empty();
+    container.append("<h1>Pick a Category</h1>")
     $.ajax({
         url: "https://opentdb.com/api_category.php",
         method: "GET"
@@ -50,33 +44,41 @@ function renderDifficultyButtons() {
     let easyButton = $("<btn/>")
         .addClass("btn btn-success btn-block .btn-group-vertical difficulty")
         .html("easy")
-    $(".container").append(easyButton);
+    container.append(easyButton);
     let hardButton = $("<btn/>")
         .addClass("btn btn-danger btn-block .btn-group-vertical difficulty")
         .html("hard")
-    $(".container").append(hardButton);
+    container.append(hardButton);
 }
 
 
+
+
+
 function renderStartButton() {
-    $(".container").empty()
+    container.empty()
     let newButton = $("<btn/>")
         .addClass("btn btn-info btn-block .btn-group-vertical")
         .attr("id", "start-button")
         .text("Start")
-    $(".container").append(newButton);
-    $(".container").prepend("<h1>Y'all ready for this??</h1>")
+    container.append(newButton);
+    container.prepend("<h1>Y'all ready for this??</h1>")
 }
+
 
 
 
 
 function renderQuestion() {
+    countDown();
     let currentQuestion = questionBank[0].question;
-    $(".container").empty();
-    $(".container").append("<h1>" + currentQuestion + "</h1");
+    container.empty();
+    container.append("<h1>" + currentQuestion + "</h1");
     renderSelectionButtons()
 }
+
+
+
 
 function renderSelectionButtons() {
     let possibleAnswers = [];
@@ -90,25 +92,36 @@ function renderSelectionButtons() {
         let newButton = $("<btn/>")
             .addClass("btn btn-info btn-block .btn-group-vertical answer-selection")
             .text(possibleAnswers[randomIndex])
-        $(".container").append(newButton);
+        container.append(newButton);
         possibleAnswers.splice(randomIndex, 1);
     }
 }
 
 
+
+
+
 function renderGameStats() {
-    $(".container").empty();
-    $(".container").append("<h3> Correct Answers: " + numberCorrect + "</h3")
-    $(".container").append("<h3> Wrong Answers: " + numberWrong + "</h3")
+    $("#timer").empty();
+    container.empty();
+    container.append("<h1>Thanks for Playing!</h1");
+    container.append("<h3> Correct Answers: " + numberCorrect + "</h3");
+    container.append("<h3> Wrong Answers: " + numberWrong + "</h3");
 }
+
+
+
 
 
 function renderRestart() {
     let newButton = $("<btn/>")
         .addClass("btn btn-success btn-block .btn-group-vertical restart")
         .text("Try Again!")
-    $(".container").append(newButton);
+    container.append(newButton);
 }
+
+
+
 
 
 
@@ -123,16 +136,40 @@ function checkGameEnd() {
 }
 
 
-function ifWrong() {
+
+
+
+function ifTimeOut() {
+    $("#timer").empty(); //why does this not work here??
+    numberWrong++;
     $.ajax({
-        url: "https://api.giphy.com/v1/gifs/random?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&tag=wrong&rating=G",
+        url: "https://api.giphy.com/v1/gifs/random?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&tagtimes-up=&rating=G",
         method: "GET"
     }).done(function (response) {
-        console.log(response)
-        let gifURL = response.data.image_url
-        console.log(gifURL)
         let gifImg = $("<img>")
-        gifImg.attr("src", gifURL)
+        gifImg.attr("src", response.data.image_url)
+        container.empty();
+        container.append("<h1>Times Up!!</h1>")
+        container.append(gifImg)
+        container.append("<h3>The correct answer was: " + correctAnswer)
+    })
+    setTimeout(function () {
+
+        checkGameEnd();
+    }, 5000)
+}
+
+
+
+
+
+function ifWrong() {
+    $.ajax({
+        url: "https://api.giphy.com/v1/gifs/random?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&tag=thumbs-down&rating=G",
+        method: "GET"
+    }).done(function (response) {
+        let gifImg = $("<img>")
+        gifImg.attr("src", response.data.image_url)
         container.empty();
         container.append("<h1>Wrong!</h1>")
         container.append(gifImg)
@@ -144,16 +181,16 @@ function ifWrong() {
 
 }
 
+
+
+
 function ifRight() {
     $.ajax({
-        url: "https://api.giphy.com/v1/gifs/random?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&tag=winning&rating=G",
+        url: "https://api.giphy.com/v1/gifs/random?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&tag=clapping&rating=G",
         method: "GET"
     }).done(function (response) {
-        console.log(response)
-        let gifURL = response.data.image_url
-        console.log(gifURL)
         let gifImg = $("<img>")
-        gifImg.attr("src", gifURL)
+        gifImg.attr("src", response.data.image_url)
         container.empty();
         container.append("<h1>Right!</h1>")
         container.append(gifImg)
@@ -168,11 +205,9 @@ function ifRight() {
 
 
 
-
-
-
-
 function checkAnswer(obj) {
+    $("#timer").empty();
+    clearInterval(decreaseTime)
     if ($(obj).text() === correctAnswer) {
         numberCorrect++
         ifRight()
@@ -180,6 +215,26 @@ function checkAnswer(obj) {
     } else {
         numberWrong++
         ifWrong();
+    }
+}
+
+
+
+
+
+function countDown() {
+    timeRemaining = 10;
+    decreaseTime = setInterval(timer, 1000);
+
+    function timer() {
+        if (timeRemaining === 0) {
+            clearInterval(decreaseTime)
+            ifTimeOut();
+        }
+        if (timeRemaining > 0) {
+            timeRemaining--
+        }
+        $("#timer").text("Time Remaining: " + timeRemaining + "Seconds!")
     }
 }
 
@@ -223,6 +278,7 @@ $(document).on("click", "#start-button", function () {
 $(document).on("click", ".answer-selection", function () {
     checkAnswer(this)
 })
+
 
 $(document).on("click", ".restart", function () {
     initialSetup()
