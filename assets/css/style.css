@@ -7,6 +7,7 @@ body {
     font-family: 'Roboto', sans-serif;
     font-weight: 900;
     color: #F6F000;
+    cursor: default;
 }
 
 h1 {
@@ -65,6 +66,7 @@ p {
     min-width: fit-content;
     max-width: 300px;
     margin: .85em auto;
+    cursor: pointer;
 }
 
 .img-wrapper {
