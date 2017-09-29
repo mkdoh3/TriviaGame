@@ -40,12 +40,14 @@ p {
 }
 
 .wrapper {
-    width: 80%;
-    max-width: 900px;
+    height: 75vh;
+    width: 75%;
+    max-width: 850px;
     margin: 0 auto;
     margin-top: 3em;
     border: .25em groove #F6F000;
     background-color: rgba(0, 0, 0, .5);
+    position: relative;
 
 }
 
@@ -69,16 +71,19 @@ p {
     cursor: pointer;
 }
 
-.img-wrapper {
-    position: relative;
-    text-align: center;
-    margin: 0 auto;
+#start-button {
+    margin-top: 2em;
+    font-size: 2em;
+    background-color: #40F99B
 }
 
-.jack {
-    position: relative;
+.img-wrapper {
+    position: absolute;
+    left: 50%;
     bottom: -2em;
+    transform: translate(-50%, 0)
 }
+
 
 .giphy {
     max-width: 50%;

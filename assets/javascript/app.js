@@ -74,7 +74,7 @@ function renderStartButton() {
     let newButton = $("<btn/>")
         .addClass("btn btn-outline-secondary btn-block .btn-group-vertical")
         .attr("id", "start-button")
-        .text("Start")
+        .text("START")
     container.append(newButton);
     container.prepend("<h1>Y'all ready for this??</h1>")
 }
@@ -263,8 +263,7 @@ $(document).on("click", ".category-select", function (e) {
 
 
 
-$(document).on("click", ".difficulty", function (e) {
-    e.stopPropagation();
+$(document).on("click", ".difficulty", function () {
     difficulty = $(this).text().toLocaleLowerCase();
     $.ajax({
         url: "https://opentdb.com/api.php?amount=5&category=" + categoryID + "&difficulty=" + difficulty + "&type=multiple",
@@ -277,13 +276,12 @@ $(document).on("click", ".difficulty", function (e) {
 })
 
 
-$(document).on("click", "#start-button", function (e) {
-    e.stopPropagation();
+$(document).on("click", "#start-button", function () {
     renderQuestion();
 })
 
 
-$(document).off("click", ".answer-selection").on("click", ".answer-selection", function () {
+$(document).on("click", ".answer-selection", function () {
     checkAnswer(this)
 })
 
