@@ -1,6 +1,5 @@
-//why does my timer not show up right away
-//why does timer.empty not work inside of the ifTimeOut function??
-
+//gotta figure out a way to prevent multiple events from triggering on fast multi clicks. 
+//also need to sort out why the next question seems to briefly flash before the gif page displays
 
 let randomCategories = [];
 let categoryID = 0;
