@@ -9,17 +9,25 @@ let numberCorrect = 0;
 let numberWrong = 0;
 let questionBank = [];
 let correctAnswer = "";
-let timeRemaining = 10;
-var decreaseTime;
 const container = $(".container");
 
 
 function initialSetup() {
+    gameReset();
+    getRandomCategories();
+
+};
+
+
+function gameReset() {
     randomCategories = [];
     numberCorrect = 0;
     numberWrong = 0;
     container.empty();
     container.append("<h1>Pick a Category</h1>")
+};
+
+function getRandomCategories() {
     $.ajax({
         url: "https://opentdb.com/api_category.php",
         method: "GET"
@@ -29,36 +37,42 @@ function initialSetup() {
             let index = Math.floor(Math.random() * 24);
             randomCategories.push(categories[index]);
         }
-        $.each(randomCategories, function (i, element) {
-            let newButton = $("<btn/>")
-                .addClass("btn btn-info btn-block .btn-group-vertical category-select")
-                .attr("data", element.id)
-                .text(element.name)
-            container.append(newButton);
-        })
+        renderCategoryButtons();
     })
-}
+};
+
+function renderCategoryButtons() {
+    console.log(randomCategories)
+    $.each(randomCategories, function (i, element) {
+        let category = element.name;
+        category = category.replace(/Entertainment: /g, '');
+        let newButton = $("<btn/>")
+            .addClass("btn btn-outline-secondary btn-block .btn-group-vertical category-select")
+            .attr("data", element.id)
+            .text(category)
+        container.append(newButton);
+    })
+};
+
 
 
 function renderDifficultyButtons() {
     let easyButton = $("<btn/>")
-        .addClass("btn btn-success btn-block .btn-group-vertical difficulty")
-        .html("easy")
+        .addClass("btn btn-outline-secondary btn-block .btn-group-vertical difficulty")
+        .html("Easy")
     container.append(easyButton);
     let hardButton = $("<btn/>")
-        .addClass("btn btn-danger btn-block .btn-group-vertical difficulty")
-        .html("hard")
+        .addClass("btn btn-outline-secondary btn-block .btn-group-vertical difficulty")
+        .html("Hard")
     container.append(hardButton);
 }
-
-
 
 
 
 function renderStartButton() {
     container.empty()
     let newButton = $("<btn/>")
-        .addClass("btn btn-info btn-block .btn-group-vertical")
+        .addClass("btn btn-outline-secondary btn-block .btn-group-vertical")
         .attr("id", "start-button")
         .text("Start")
     container.append(newButton);
@@ -67,16 +81,15 @@ function renderStartButton() {
 
 
 
-
-
 function renderQuestion() {
     countDown();
     let currentQuestion = questionBank[0].question;
+    let questionElement = $("<h2>");
+    questionElement.html(currentQuestion);
     container.empty();
-    container.append("<h1>" + currentQuestion + "</h1");
+    container.append(questionElement);
     renderSelectionButtons()
 }
-
 
 
 
@@ -90,7 +103,7 @@ function renderSelectionButtons() {
     for (let i = 0; i < 4; i++) {
         let randomIndex = Math.floor(Math.random() * possibleAnswers.length);
         let newButton = $("<btn/>")
-            .addClass("btn btn-info btn-block .btn-group-vertical answer-selection")
+            .addClass("btn btn-outline-secondary btn-block .btn-group-vertical answer-selection")
             .text(possibleAnswers[randomIndex])
         container.append(newButton);
         possibleAnswers.splice(randomIndex, 1);
@@ -100,27 +113,23 @@ function renderSelectionButtons() {
 
 
 
-
 function renderGameStats() {
     $("#timer").empty();
     container.empty();
     container.append("<h1>Thanks for Playing!</h1");
-    container.append("<h3> Correct Answers: " + numberCorrect + "</h3");
-    container.append("<h3> Wrong Answers: " + numberWrong + "</h3");
+    container.append("<h4> Correct Answers: " + numberCorrect + "</h4");
+    container.append("<h4> Wrong Answers: " + numberWrong + "</h4");
 }
-
 
 
 
 
 function renderRestart() {
     let newButton = $("<btn/>")
-        .addClass("btn btn-success btn-block .btn-group-vertical restart")
+        .addClass("btn btn-outline-secondary btn-block .btn-group-vertical restart")
         .text("Try Again!")
     container.append(newButton);
 }
-
-
 
 
 
@@ -137,8 +146,6 @@ function checkGameEnd() {
 
 
 
-
-
 function ifTimeOut() {
     $("#timer").empty(); //why does this not work here??
     numberWrong++;
@@ -147,62 +154,64 @@ function ifTimeOut() {
         method: "GET"
     }).done(function (response) {
         let gifImg = $("<img>")
-        gifImg.attr("src", response.data.image_url)
+        gifImg.attr("src", response.data.fixed_height_downsampled_url)
+        gifImg.addClass("giphy")
         container.empty();
         container.append("<h1>Times Up!!</h1>")
         container.append(gifImg)
-        container.append("<h3>The correct answer was: " + correctAnswer)
+        container.append("<p>The correct answer was: " + correctAnswer + "</p>")
     })
     setTimeout(function () {
 
         checkGameEnd();
     }, 5000)
 }
-
 
 
 
 
 function ifWrong() {
+    //ajax call to get "thumbs-down" gif and display it for 5 seconds
     $.ajax({
         url: "https://api.giphy.com/v1/gifs/random?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&tag=thumbs-down&rating=G",
         method: "GET"
     }).done(function (response) {
+        console.log(response)
         let gifImg = $("<img>")
-        gifImg.attr("src", response.data.image_url)
+        gifImg.attr("src", response.data.fixed_height_downsampled_url)
+        gifImg.addClass("giphy")
         container.empty();
         container.append("<h1>Wrong!</h1>")
         container.append(gifImg)
-        container.append("<h3>The correct answer was: " + correctAnswer)
+        container.append("<p>The correct answer was: " + correctAnswer + "</p")
     })
     setTimeout(function () {
         checkGameEnd();
     }, 5000)
 
 }
-
 
 
 
 function ifRight() {
+    //ajax call to get "clapping" gif and display it for 5 seconds
     $.ajax({
         url: "https://api.giphy.com/v1/gifs/random?api_key=CDrewNwfN9TWDnXhucfwDmCGcZIfoVuy&tag=clapping&rating=G",
         method: "GET"
     }).done(function (response) {
+        console.log(response)
         let gifImg = $("<img>")
         gifImg.attr("src", response.data.image_url)
+        gifImg.addClass("giphy")
         container.empty();
-        container.append("<h1>Right!</h1>")
+        container.append("<h1>BOOMSHAKALAKA!</h1>")
         container.append(gifImg)
-        container.append("<h3>Way to Go!</h3>")
+        container.append("<h3>Correct!</h3>")
     })
     setTimeout(function () {
         checkGameEnd();
     }, 5000)
 }
-
-
-
 
 
 function checkAnswer(obj) {
@@ -219,11 +228,9 @@ function checkAnswer(obj) {
 }
 
 
-
-
-
 function countDown() {
     timeRemaining = 10;
+    $("#timer").html("<h5>Time Remaining: " + timeRemaining + " Seconds!</h5>")
     decreaseTime = setInterval(timer, 1000);
 
     function timer() {
@@ -234,11 +241,9 @@ function countDown() {
         if (timeRemaining > 0) {
             timeRemaining--
         }
-        $("#timer").text("Time Remaining: " + timeRemaining + "Seconds!")
+        $("#timer").html("<h5>Time Remaining: " + timeRemaining + " Seconds!</h5>")
     }
 }
-
-
 
 
 
@@ -248,7 +253,8 @@ $(document).ready(function () {
 
 
 
-$(document).on("click", ".category-select", function () {
+$(document).on("click", ".category-select", function (e) {
+    e.stopPropagation();
     categoryID = $(this).attr("data");
     container.empty()
     container.html('<h1>Choose a difficulty</h1>')
@@ -257,8 +263,9 @@ $(document).on("click", ".category-select", function () {
 
 
 
-$(document).on("click", ".difficulty", function () {
-    difficulty = $(this).text();
+$(document).on("click", ".difficulty", function (e) {
+    e.stopPropagation();
+    difficulty = $(this).text().toLocaleLowerCase();
     $.ajax({
         url: "https://opentdb.com/api.php?amount=5&category=" + categoryID + "&difficulty=" + difficulty + "&type=multiple",
         method: "GET"
@@ -270,16 +277,18 @@ $(document).on("click", ".difficulty", function () {
 })
 
 
-$(document).on("click", "#start-button", function () {
+$(document).on("click", "#start-button", function (e) {
+    e.stopPropagation();
     renderQuestion();
 })
 
 
-$(document).on("click", ".answer-selection", function () {
+$(document).off("click", ".answer-selection").on("click", ".answer-selection", function () {
     checkAnswer(this)
 })
 
 
-$(document).on("click", ".restart", function () {
+$(document).on("click", ".restart", function (e) {
+    e.stopPropagation();
     initialSetup()
 })
